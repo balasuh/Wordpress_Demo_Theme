@@ -1,5 +1,15 @@
 <?php
 
+require get_theme_file_path('/includes/search-route.php');
+
+function university_custom_rest() {
+    register_rest_field('post', 'authorName', array(
+        'get_callback' => function() {return get_the_author();}
+    ));
+}
+
+add_action('rest_api_init', 'university_custom_rest');
+
 //Importing dotenv functionality from phpdotenv - START
 
 require_once __DIR__ . '/vendor/autoload.php';
@@ -58,6 +68,10 @@ function university_files()
     wp_enqueue_style('external-google-fonts', '//fonts.googleapis.com/css?family=Roboto+Condensed:300,300i,400,400i,700,700i|Roboto:100,300,400,400i,700,700i');
     wp_enqueue_style('university_main_styles', get_theme_file_uri('/build/style-index.css'));
     wp_enqueue_style('university_extra_styles', get_theme_file_uri('/build/index.css'));
+    
+    wp_localize_script('main_university_js', 'universityData', array(
+        'root_url' => get_site_url()
+    ));
 }
 
 function university_features()
@@ -84,7 +98,7 @@ function disable_url_guessing($url_guessing)
 function university_adjust_queries($query)
 {
     if (!is_admin() and is_post_type_archive('campus') and $query->is_main_query()) {
-        $query->set('posts_per_page', -l);
+        $query->set('posts_per_page', -1);
     };
 
 
